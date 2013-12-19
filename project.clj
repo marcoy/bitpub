@@ -9,6 +9,7 @@
   :repl-options {:init (do
                          (use 'bitpub.connect)
                          (require '[clojure.core.async :as as]
+                                  '[org.httpkit.client :as http]
                                   '[cheshire.core      :as json]
                                   '[langohr.core       :as rmq]
                                   '[langohr.channel    :as lch]
