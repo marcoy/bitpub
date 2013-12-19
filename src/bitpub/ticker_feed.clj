@@ -1,4 +1,4 @@
-(ns bitpub.bitstamp
+(ns bitpub.ticker-feed
   (:require [clojure.core.async :as as :refer [alts! close! chan go go-loop <! >! put! take!]]
             [cheshire.core :as json]
             [org.httpkit.client :as hkit]
