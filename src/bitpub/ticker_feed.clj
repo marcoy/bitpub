@@ -13,7 +13,22 @@
   campbx-ticker-url "http://campbx.com/api/xticker.php")
 
 
+;; https://vircurex.com/welcome/api?locale=en
+(def ^{:const true}
+  vircurex-ticker-url "https://vircurex.com/api/get_info_for_1_currency.json?base=BTC&alt=USD")
+
+
+;; https://btc-e.com/page/2
+(def ^{:const true}
+  btce-ticker-url "https://btc-e.com/api/2/btc_usd/ticker")
+
+
+(def ^{:const true}
+  btcchina-ticker-url "https://data.btcchina.com/data/ticker")
+
+
 (defn http-get
+  "Wrap a HTTP GET request in a go block. This returns a channel."
   [url]
   (go
     (http/get url)))
@@ -65,6 +80,18 @@
                                           :get-timeout 30000
                                           :async-put-timeout 10000
                                           :park-time-fn #(+ 1000 (rand-int 1500)))
-        feed (as/merge [campbx-feed bitstamp-feed])]
+        vircurex-feed (create-ticker-feed vircurex-ticker-url
+                                          :get-timeout 30000
+                                          :async-put-timeout 10000
+                                          :park-time-fn #(+ 5000 (rand-int 500)))
+        btce-feed (create-ticker-feed btce-ticker-url
+                                      :get-timeout 30000
+                                      :async-put-timeout 10000
+                                      :park-time-fn #(+ 1000 (rand-int 1000)))
+        btcchina-feed (create-ticker-feed btcchina-ticker-url
+                                          :get-timeout 30000
+                                          :async-put-timeout 10000
+                                          :park-time-fn #(+ 2000 (rand-int 1000)))
+        feed (as/merge [vircurex-feed campbx-feed bitstamp-feed btce-feed])]
     (while true
       (println "Data:" (:body (as/<!! feed))))))
