@@ -10,9 +10,7 @@
 
 (deftest bitstamp-tranform-fn
   (testing "Bitstamp transform function using live data"
-    (let [bitstamp-feed (create-feed bitstamp-ticker-url
-                                     #(+ 1000 (rand-int 500))
-                                     (create-transform :bitstamp keyword))
+    (let [bitstamp-feed (create-bitstamp-feed)
           data (<!! bitstamp-feed)]
       (is (map? data))
       (are [x y] (= x y)
@@ -22,10 +20,8 @@
 
 (deftest bitstamp-tranform-fn
   (testing "CampBX transform function using live data"
-    (let [bitstamp-feed (create-feed campbx-ticker-url
-                                     #(+ 1000 (rand-int 1500))
-                                     (create-transform :campbx campbx-keyfn))
-          data (<!! bitstamp-feed)]
+    (let [campbx-feed (create-campbx-feed)
+          data (<!! campbx-feed)]
       (is (map? data))
       (are [x y] (= x y)
            (:source data) :campbx
@@ -34,9 +30,7 @@
 
 (deftest vircurex-tranform-fn
   (testing "Vircurex transform function using live data"
-    (let [vircurex-feed (create-feed vircurex-ticker-url
-                                     (constantly 5000)
-                                     (create-transform :vircurex keyword))
+    (let [vircurex-feed (create-vircurex-feed)
           data (<!! vircurex-feed)]
       (is (map? data))
       (are [x y] (= x y)
@@ -46,9 +40,7 @@
 
 (deftest btce-tranform-fn
   (testing "BTC-e transform function using live data"
-    (let [btce-feed (create-feed btce-ticker-url
-                                 (constantly 5000)
-                                 (create-transform :btce keyword))
+    (let [btce-feed (create-btce-feed)
           data (<!! btce-feed)]
       (is (map? data))
       (are [x y] (= x y)
@@ -58,9 +50,7 @@
 
 (deftest btcchina-tranform-fn
   (testing "BTCChina transform function using live data"
-    (let [btcchina-feed (create-feed btcchina-ticker-url
-                                     #(+ 2000 (rand-int 1000))
-                                     (create-transform :btcchina keyword))
+    (let [btcchina-feed (create-btcchina-feed)
           data (<!! btcchina-feed)]
       (is (map? data))
       (are [x y] (= x y)

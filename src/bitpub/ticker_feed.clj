@@ -82,11 +82,11 @@
            between each poll
   tranform-fn A function to tranform each value comming out of the feed"
   ([ticker-url time-fn] (create-feed ticker-url time-fn identity))
-  ([ticker-url time-fn tranform-fn] (map< tranform-fn
-                                          (create-ticker-feed ticker-url
-                                                              :get-timeout 30000
-                                                              :async-put-timeout 10000
-                                                              :park-time-fn time-fn))))
+  ([ticker-url time-fn transform-fn] (map< transform-fn
+                                           (create-ticker-feed ticker-url
+                                                               :get-timeout 30000
+                                                               :async-put-timeout 10000
+                                                               :park-time-fn time-fn))))
 
 
 ;;
@@ -108,13 +108,56 @@
       (assoc body :source (keyword source-name)))))
 
 
+;;
+;; ## Feeds
+;;
+(defn create-bitstamp-feed []
+  (create-feed bitstamp-ticker-url
+               #(+ 1000 (rand-int 500))
+               (create-transform :bitstamp keyword)))
+
+
+(defn create-campbx-feed []
+  (create-feed campbx-ticker-url
+               #(+ 1000 (rand-int 1500))
+               (create-transform :campbx campbx-keyfn)))
+
+
+(defn create-vircurex-feed []
+  (create-feed vircurex-ticker-url
+               (constantly 5000)
+               (create-transform :vircurex keyword)))
+
+
+(defn create-btce-feed []
+  (create-feed btce-ticker-url
+               #(+ 1000 (rand-int 1000))
+               (create-transform :btce keyword)))
+
+
+(defn create-btcchina-feed []
+  (create-feed btcchina-ticker-url
+               #(+ 2000 (rand-int 1000))
+               (create-transform :btcchina keyword)))
+
+
+(def supported-feeds
+  {
+   :bitstamp create-bitstamp-feed
+   :campbx create-campbx-feed
+   :vircurex create-vircurex-feed
+   :btce create-btce-feed
+   :btcchina create-btcchina-feed
+  })
+
+
 (defn -main
   [& args]
-  (let [campbx-feed (create-feed campbx-ticker-url #(+ 1000 (rand-int 500)))
-        bitstamp-feed (create-feed bitstamp-ticker-url #(+ 1000 (rand-int 1500)))
-        vircurex-feed (create-feed vircurex-ticker-url (constantly 5000))
-        btce-feed (create-feed btce-ticker-url #(+ 1000 (rand-int 1000)))
-        btcchina-feed (create-feed btcchina-ticker-url #(+ 2000 (rand-int 1000)))
+  (let [campbx-feed (create-campbx-feed)
+        bitstamp-feed (create-bitstamp-feed)
+        vircurex-feed (create-vircurex-feed)
+        btce-feed (create-btce-feed)
+        btcchina-feed (create-btcchina-feed)
         feed (as/merge [campbx-feed bitstamp-feed vircurex-feed btce-feed btcchina-feed])]
     (while true
       (println "Data:" (:body (as/<!! feed))))))

@@ -6,7 +6,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :repl-options {:init (do
+  :repl-options {:init-ns bitpub.publish
+                 :init (do
                          (use 'bitpub.connect)
                          (require '[clojure.core.async :as as]
                                   '[org.httpkit.client :as hkit]
@@ -27,6 +28,6 @@
                  [clj-http "0.7.8"]
                  [clj-http-fake "0.4.1"]
                  [environ "0.4.0"]
-                 [com.novemberain/langohr "2.0.0"]]
+                 [com.novemberain/langohr "2.0.1"]]
 
   :plugins [[lein-environ "0.4.0"]])
