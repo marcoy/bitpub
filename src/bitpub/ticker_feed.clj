@@ -1,5 +1,6 @@
 (ns bitpub.ticker-feed
-  (:require [clojure.core.async :as as :refer [alts! close! chan go go-loop <! >! put! take!]]
+  (:require [clojure.core.async :as as :refer [alts! close! chan go go-loop <! map<]]
+            [clojure.string :as str]
             [cheshire.core :as json]
             [org.httpkit.client :as hkit]
             [clj-http.client :as http]))
@@ -33,7 +34,9 @@
   (go
     (http/get url)))
 
-
+;;
+;; ## Feed functions
+;;
 (defn create-ticker-feed
   "Poll the given ticker URL to GET the market data. It tries to place the value
    to the out channel. If no process is consuming the channel, it will wait for a
@@ -70,28 +73,48 @@
     out))
 
 
+(defn create-feed
+  "A convenient function to create a ticker feed.
+
+   Options:
+   ticker-url The ticker URL
+   time-fn A function that returns an int. It will be used as the park time in
+           between each poll
+  tranform-fn A function to tranform each value comming out of the feed"
+  ([ticker-url time-fn] (create-feed ticker-url time-fn identity))
+  ([ticker-url time-fn tranform-fn] (map< tranform-fn
+                                          (create-ticker-feed ticker-url
+                                                              :get-timeout 30000
+                                                              :async-put-timeout 10000
+                                                              :park-time-fn time-fn))))
+
+
+;;
+;; ## Transform functions
+;;
+(defn campbx-keyfn
+  [k]
+  (keyword (str/replace (str/lower-case k)
+                        #"\s"
+                        "_")))
+
+
+(defn create-transform
+  [source-name key-fn]
+  (fn [http-data]
+    (as-> http-data body
+      (:body body)
+      (json/parse-string body key-fn)
+      (assoc body :source (keyword source-name)))))
+
+
 (defn -main
   [& args]
-  (let [campbx-feed (create-ticker-feed campbx-ticker-url
-                                        :get-timeout 30000
-                                        :async-put-timeout 10000
-                                        :park-time-fn #(+ 1000 (rand-int 500)))
-        bitstamp-feed (create-ticker-feed bitstamp-ticker-url
-                                          :get-timeout 30000
-                                          :async-put-timeout 10000
-                                          :park-time-fn #(+ 1000 (rand-int 1500)))
-        vircurex-feed (create-ticker-feed vircurex-ticker-url
-                                          :get-timeout 30000
-                                          :async-put-timeout 10000
-                                          :park-time-fn #(+ 5000 (rand-int 500)))
-        btce-feed (create-ticker-feed btce-ticker-url
-                                      :get-timeout 30000
-                                      :async-put-timeout 10000
-                                      :park-time-fn #(+ 1000 (rand-int 1000)))
-        btcchina-feed (create-ticker-feed btcchina-ticker-url
-                                          :get-timeout 30000
-                                          :async-put-timeout 10000
-                                          :park-time-fn #(+ 2000 (rand-int 1000)))
-        feed (as/merge [vircurex-feed campbx-feed bitstamp-feed btce-feed])]
+  (let [campbx-feed (create-feed campbx-ticker-url #(+ 1000 (rand-int 500)))
+        bitstamp-feed (create-feed bitstamp-ticker-url #(+ 1000 (rand-int 1500)))
+        vircurex-feed (create-feed vircurex-ticker-url (constantly 5000))
+        btce-feed (create-feed btce-ticker-url #(+ 1000 (rand-int 1000)))
+        btcchina-feed (create-feed btcchina-ticker-url #(+ 2000 (rand-int 1000)))
+        feed (as/merge [campbx-feed bitstamp-feed vircurex-feed btce-feed btcchina-feed])]
     (while true
       (println "Data:" (:body (as/<!! feed))))))

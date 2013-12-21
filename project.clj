@@ -17,13 +17,15 @@
                                   '[langohr.exchange   :as le]
                                   '[langohr.queue      :as lq]
                                   '[langohr.consumers  :as lc]
-                                  '[langohr.basic      :as lb]))}
+                                  '[langohr.basic      :as lb]
+                                  '[bitpub.ticker-feed :as feed]))}
 
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [cheshire "5.3.0"]
                  [http-kit "2.1.13"]
                  [clj-http "0.7.8"]
+                 [clj-http-fake "0.4.1"]
                  [environ "0.4.0"]
                  [com.novemberain/langohr "2.0.0"]]
 
