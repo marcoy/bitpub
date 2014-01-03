@@ -5,11 +5,11 @@ You will need to define an environment variable named `RABBITMQ_URL` which
 should contain the value of the RabbitMQ connection string.
 
 The supported exchanges are:
-CampBx - https://campbx.com/
-Bitstamp - https://www.bitstamp.net/
-Vircurex - https://vircurex.com/
-BTC-e - https://btc-e.com/
-BTC China - https://vip.btcchina.com/
+ * CampBx - https://campbx.com/
+ * Bitstamp - https://www.bitstamp.net/
+ * Vircurex - https://vircurex.com/
+ * BTC-e - https://btc-e.com/
+ * BTC China - https://vip.btcchina.com/
 
 ## Usage
 
