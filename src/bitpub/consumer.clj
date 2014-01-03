@@ -22,7 +22,7 @@
         q (:queue (lq/declare ch "all-feeds" :exclusive false :auto-delete false))
         handler (fn [ch {:keys [routing-key] :as metadata} ^bytes payload]
                   (let [jmsg (json/parse-string (String. payload "UTF-8") true)]
-                    (println (format "%s (rk: %s)" (:source jmsg) routing-key))))]
+                    (println (format "%s (rk: %s)" jmsg routing-key))))]
     (lq/bind ch q ename :routing-key "ticker.#")
     (lc/subscribe ch q handler :auto-ack true)
     (println "Subscribed")))

@@ -160,4 +160,4 @@
         btcchina-feed (create-btcchina-feed)
         feed (as/merge [campbx-feed bitstamp-feed vircurex-feed btce-feed btcchina-feed])]
     (while true
-      (println "Data:" (:body (as/<!! feed))))))
+      (println "Data:" (as/<!! feed)))))
