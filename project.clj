@@ -28,6 +28,6 @@
                  [clj-http "0.7.8"]
                  [clj-http-fake "0.7.8"]
                  [environ "0.4.0"]
-                 [com.novemberain/langohr "2.1.0"]]
+                 [com.novemberain/langohr "2.3.2"]]
 
   :plugins [[lein-environ "0.4.0"]])
